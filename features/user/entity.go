@@ -26,7 +26,7 @@ type Model interface {
 	Register(register_data User) error
 	Login(email string) (User, error)
 	Profile(id string) (User, error)
-	Update(data User, pass bool) error
+	Update(data User) error
 	Delete(id string) error
 }
 
@@ -51,11 +51,8 @@ type Register struct {
 }
 
 type Update struct {
-	Name  string `validate:"alpha,min=4"`
-	Hp    string `validate:"number,min=11"`
-	Email string `validate:"email"`
-}
-
-type UpdatePassword struct {
-	Password string `validate:"alphanumunicode,min=8"`
+	Name     string `validate:"alpha,min=4"`
+	Hp       string `validate:"number,min=11"`
+	Email    string `validate:"email"`
+	Password string `validate:"min=8"`
 }

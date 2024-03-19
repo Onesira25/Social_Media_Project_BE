@@ -5,8 +5,8 @@ import (
 	"Social_Media_Project_BE/helper"
 	"Social_Media_Project_BE/middlewares"
 	"errors"
-	"log"
 	"strconv"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/go-sql-driver/mysql"
@@ -30,11 +30,13 @@ func NewService(m user.Model) user.Service {
 func (s *service) Register(update_data user.User) error {
 	// Check Validate
 	var validate user.Register
-	helper.Recast(&update_data, &validate)
+	validate.Name = update_data.Name
+	validate.Email = update_data.Email
+	validate.Hp = update_data.Hp
+	validate.Password = update_data.Password
 	err := s.v.Struct(&validate)
 	if err != nil {
-		log.Println("error validate", err.Error())
-		return err
+		return errors.New(helper.ErrorInvalidValidate)
 	}
 
 	// Hashing Password
@@ -59,11 +61,11 @@ func (s *service) Register(update_data user.User) error {
 func (s *service) Login(login_data user.User) (string, error) {
 	// Check Validate
 	var validate user.Login
-	helper.Recast(&login_data, &validate)
+	validate.Email = login_data.Email
+	validate.Password = login_data.Password
 	err := s.v.Struct(&validate)
 	if err != nil {
-		log.Println("error validate", err.Error())
-		return "", err
+		return "", errors.New(helper.ErrorInvalidValidate)
 	}
 
 	// Do Login & Get Password
@@ -106,24 +108,27 @@ func (s *service) Update(token *jwt.Token, update_data user.User) error {
 	decodeID := middlewares.DecodeToken(token)
 
 	// Check Validate Password & Others
-	var change_password = false
-	if update_data.Password != "" {
-		var validate user.UpdatePassword
-		helper.Recast(&update_data, &validate)
-		err := s.v.Struct(&validate)
-		if err != nil {
-			log.Println("error validate", err.Error())
-			return err
+	var validate user.Update
+	validate.Name = update_data.Name
+	validate.Email = update_data.Email
+	validate.Hp = update_data.Hp
+	validate.Password = update_data.Password
+	err := s.v.Struct(&validate)
+	if err != nil {
+		if strings.Contains(err.Error(), "Name") {
+			update_data.Name = ""
 		}
-
-		change_password = true
-	} else {
-		var validate user.Update
-		helper.Recast(&update_data, &validate)
-		err := s.v.Struct(&validate)
-		if err != nil {
-			log.Println("error validate", err.Error())
-			return err
+		if strings.Contains(err.Error(), "Email") {
+			update_data.Email = ""
+		}
+		if strings.Contains(err.Error(), "Hp") {
+			update_data.Hp = ""
+		}
+		if strings.Contains(err.Error(), "Password") {
+			update_data.Password = ""
+		}
+		if strings.Count(err.Error(), "\n") == 3 {
+			return errors.New(helper.ErrorInvalidValidate)
 		}
 	}
 
@@ -135,7 +140,7 @@ func (s *service) Update(token *jwt.Token, update_data user.User) error {
 	update_data.ID = uint(id_int)
 
 	// Hashing Password
-	if change_password {
+	if update_data.Password != "" {
 		newPassword, err := s.pm.HashPassword(update_data.Password)
 		if err != nil {
 			return errors.New(helper.ErrorGeneralServer)
@@ -144,7 +149,7 @@ func (s *service) Update(token *jwt.Token, update_data user.User) error {
 	}
 
 	// Update Data
-	if err := s.model.Update(update_data, change_password); err != nil {
+	if err := s.model.Update(update_data); err != nil {
 		return err
 	}
 

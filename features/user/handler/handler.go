@@ -77,9 +77,12 @@ func (ct *controller) Profile() echo.HandlerFunc {
 		}
 
 		var profileResponse ProfileResponse
-		if helper.Recast(&profile, &profileResponse) != nil {
-			return c.JSON(helper.ResponseFormat(http.StatusInternalServerError, helper.ErrorGeneralServer))
-		}
+		profileResponse.ID = profile.ID
+		profileResponse.CreatedAt = profile.CreatedAt
+		profileResponse.UpdatedAt = profile.UpdatedAt
+		profileResponse.Name = profile.Name
+		profileResponse.Email = profile.Email
+		profileResponse.Hp = profile.Hp
 
 		return c.JSON(helper.ResponseFormat(http.StatusOK, "success get user profile", map[string]any{"user": profileResponse}))
 	}

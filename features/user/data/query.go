@@ -34,15 +34,25 @@ func (m *model) Profile(id string) (user.User, error) {
 	return result, err
 }
 
-func (m *model) Update(data user.User, pass bool) error {
-	var query *gorm.DB
-	if pass {
-		query = m.connection.Model(&data).Select("password").Updates(&data)
-	} else {
-		query = m.connection.Model(&data).Omit("password").Updates(&data)
+func (m *model) Update(data user.User) error {
+	var selectUpdate []string
+	if data.Name != "" {
+		selectUpdate = append(selectUpdate, "name")
+	}
+	if data.Email != "" {
+		selectUpdate = append(selectUpdate, "email")
+	}
+	if data.Hp != "" {
+		selectUpdate = append(selectUpdate, "hp")
+	}
+	if data.Password != "" {
+		selectUpdate = append(selectUpdate, "pasword")
+	}
+	if len(selectUpdate) == 0 {
+		return errors.New(helper.ErrorNoRowsAffected)
 	}
 
-	if query.Error != nil {
+	if query := m.connection.Model(&data).Select(selectUpdate).Updates(&data); query.Error != nil {
 		return errors.New(helper.ErrorGeneralDatabase)
 	} else if query.RowsAffected == 0 {
 		return errors.New(helper.ErrorNoRowsAffected)
