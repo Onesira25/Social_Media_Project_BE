@@ -8,16 +8,14 @@ package helper
 // 	500: "an error occurred in the server process",
 // }
 
-func ResponseFormat(status int, message any, data ...map[string]any) (int, map[string]any) {
+func ResponseFormat(status int, message any, data ...any) (int, map[string]any) {
 	result := map[string]any{
 		"code":    status,
 		"message": message,
 	}
 
-	for _, part := range data {
-		for key, value := range part {
-			result[key] = value
-		}
+	if len(data) > 0 {
+		result["data"] = data[0]
 	}
 	return status, result
 }
