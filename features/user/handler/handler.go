@@ -22,7 +22,7 @@ func NewHandler(s user.Service) user.Controller {
 
 func (ct *controller) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input user.User
+		var input user.Register
 		err := c.Bind(&input)
 		if err != nil {
 			if strings.Contains(err.Error(), "unsupport") {
@@ -36,7 +36,7 @@ func (ct *controller) Register() echo.HandlerFunc {
 			return c.JSON(helper.ResponseFormat(helper.ErrorCode(err), err.Error()))
 		}
 
-		return c.JSON(helper.ResponseFormat(http.StatusCreated, "Congratulations, the data has been registered"))
+		return c.JSON(helper.ResponseFormat(http.StatusCreated, "Registered Successfully"))
 	}
 }
 
@@ -55,12 +55,12 @@ func (ct *controller) Login() echo.HandlerFunc {
 		processData.Email = input.Email
 		processData.Password = input.Password
 
-		token, err := ct.service.Login(processData)
+		usertoken, err := ct.service.Login(processData)
 		if err != nil {
 			return c.JSON(helper.ResponseFormat(helper.ErrorCode(err), err.Error()))
 		}
 
-		return c.JSON(helper.ResponseFormat(http.StatusOK, "login successful", map[string]any{"token": token}))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "Login Successfully", usertoken))
 	}
 }
 
@@ -77,14 +77,15 @@ func (ct *controller) Profile() echo.HandlerFunc {
 		}
 
 		var profileResponse ProfileResponse
-		profileResponse.ID = profile.ID
 		profileResponse.CreatedAt = profile.CreatedAt
 		profileResponse.UpdatedAt = profile.UpdatedAt
-		profileResponse.Name = profile.Name
+		profileResponse.Fullname = profile.Fullname
+		profileResponse.Username = profile.Username
 		profileResponse.Email = profile.Email
-		profileResponse.Hp = profile.Hp
+		profileResponse.Handphone = profile.Handphone
+		profileResponse.Biodata = profile.Biodata
 
-		return c.JSON(helper.ResponseFormat(http.StatusOK, "success get user profile", map[string]any{"user": profileResponse}))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "Successfully Get MyProfile", profileResponse))
 	}
 }
 
@@ -109,7 +110,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 			return c.JSON(helper.ResponseFormat(helper.ErrorCode(err), err.Error()))
 		}
 
-		return c.JSON(helper.ResponseFormat(http.StatusOK, "success update user"))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "Successfully Updated"))
 	}
 }
 
@@ -124,6 +125,6 @@ func (ct *controller) Delete() echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(helper.ResponseFormat(helper.ErrorCode(err), err.Error()))
 		}
-		return c.JSON(helper.ResponseFormat(http.StatusOK, "success delete user"))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "Successfully Deleted User"))
 	}
 }

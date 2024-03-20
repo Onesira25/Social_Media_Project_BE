@@ -27,27 +27,35 @@ func NewService(m user.Model) user.Service {
 	}
 }
 
-func (s *service) Register(update_data user.User) error {
+func (s *service) Register(register_data user.Register) error {
 	// Check Validate
 	var validate user.Register
-	validate.Name = update_data.Name
-	validate.Email = update_data.Email
-	validate.Hp = update_data.Hp
-	validate.Password = update_data.Password
+	validate.Fullname = register_data.Fullname
+	validate.Username = register_data.Username
+	validate.Email = register_data.Email
+	validate.Handphone = register_data.Handphone
+	validate.Password = register_data.Password
 	err := s.v.Struct(&validate)
 	if err != nil {
 		return errors.New(helper.ErrorInvalidValidate)
 	}
 
 	// Hashing Password
-	newPassword, err := s.pm.HashPassword(update_data.Password)
+	newPassword, err := s.pm.HashPassword(register_data.Password)
 	if err != nil {
 		return errors.New(helper.ErrorGeneralServer)
 	}
-	update_data.Password = newPassword
+
+	user_data := user.User{
+		Fullname:  register_data.Fullname,
+		Username:  register_data.Username,
+		Handphone: register_data.Handphone,
+		Email:     register_data.Email,
+		Password:  newPassword,
+	}
 
 	// Do Register
-	err = s.model.Register(update_data)
+	err = s.model.Register(user_data)
 	if err != nil {
 		if mysqlErr, ok := err.(*mysql.MySQLError); ok {
 			return errors.New(mysqlErr.Message)
@@ -58,35 +66,35 @@ func (s *service) Register(update_data user.User) error {
 	return nil
 }
 
-func (s *service) Login(login_data user.User) (string, error) {
-	// Check Validate
-	var validate user.Login
-	validate.Email = login_data.Email
-	validate.Password = login_data.Password
-	err := s.v.Struct(&validate)
-	if err != nil {
-		return "", errors.New(helper.ErrorInvalidValidate)
-	}
-
+func (s *service) Login(login_data user.User) (user.LoginResponse, error) {
 	// Do Login & Get Password
 	dbData, err := s.model.Login(login_data.Email)
 	if err != nil {
-		return "", errors.New(helper.ErrorDatabaseNotFound)
+		return user.LoginResponse{}, errors.New(helper.ErrorDatabaseNotFound)
 	}
 
 	// Compare Password
 	if err := s.pm.ComparePassword(login_data.Password, dbData.Password); err != nil {
-		return "", errors.New(helper.ErrorUserCredential)
+		return user.LoginResponse{}, errors.New(helper.ErrorUserCredential)
 	}
 
 	// Create Token
 	token, err := middlewares.GenerateJWT(strconv.Itoa(int(dbData.ID)))
 	if err != nil {
-		return "", errors.New(helper.ErrorGeneralServer)
+		return user.LoginResponse{}, errors.New(helper.ErrorGeneralServer)
 	}
 
 	// Finished
-	return token, nil
+	var result user.LoginResponse
+	result.CreatedAt = dbData.CreatedAt.UTC()
+	result.UpdatedAt = dbData.UpdatedAt.UTC()
+	result.Email = dbData.Email
+	result.Fullname = dbData.Fullname
+	result.Username = dbData.Username
+	result.Handphone = dbData.Handphone
+	result.Biodata = dbData.Biodata
+	result.Token = token
+	return result, nil
 }
 
 func (s *service) Profile(token *jwt.Token) (user.User, error) {
@@ -100,6 +108,8 @@ func (s *service) Profile(token *jwt.Token) (user.User, error) {
 	}
 
 	// Finished
+	result.CreatedAt = result.CreatedAt.UTC()
+	result.UpdatedAt = result.UpdatedAt.UTC()
 	return result, nil
 }
 
@@ -109,25 +119,29 @@ func (s *service) Update(token *jwt.Token, update_data user.User) error {
 
 	// Check Validate Password & Others
 	var validate user.Update
-	validate.Name = update_data.Name
+	validate.Fullname = update_data.Fullname
+	validate.Username = update_data.Username
 	validate.Email = update_data.Email
-	validate.Hp = update_data.Hp
+	validate.Handphone = update_data.Handphone
 	validate.Password = update_data.Password
 	err := s.v.Struct(&validate)
 	if err != nil {
-		if strings.Contains(err.Error(), "Name") {
-			update_data.Name = ""
+		if strings.Contains(err.Error(), "Fullname") {
+			update_data.Fullname = ""
+		}
+		if strings.Contains(err.Error(), "Username") {
+			update_data.Username = ""
 		}
 		if strings.Contains(err.Error(), "Email") {
 			update_data.Email = ""
 		}
-		if strings.Contains(err.Error(), "Hp") {
-			update_data.Hp = ""
+		if strings.Contains(err.Error(), "Handphone") {
+			update_data.Handphone = ""
 		}
 		if strings.Contains(err.Error(), "Password") {
 			update_data.Password = ""
 		}
-		if strings.Count(err.Error(), "\n") == 3 {
+		if update_data.Biodata == "" && strings.Count(err.Error(), "\n") >= 4 {
 			return errors.New(helper.ErrorInvalidValidate)
 		}
 	}

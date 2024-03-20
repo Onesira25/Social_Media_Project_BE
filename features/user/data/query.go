@@ -4,6 +4,7 @@ import (
 	"Social_Media_Project_BE/features/user"
 	"Social_Media_Project_BE/helper"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -19,12 +20,14 @@ func New(db *gorm.DB) user.Model {
 }
 
 func (m *model) Register(newData user.User) error {
+	newData.CreatedAt = time.Now().UTC()
+	newData.UpdatedAt = time.Now().UTC()
 	return m.connection.Create(&newData).Error
 }
 
-func (m *model) Login(email string) (user.User, error) {
+func (m *model) Login(input string) (user.User, error) {
 	var result user.User
-	err := m.connection.Where("email = ?", email).First(&result).Error
+	err := m.connection.Where("username = ? OR email = ? OR handphone = ?", input, input, input).First(&result).Error
 	return result, err
 }
 
@@ -36,21 +39,29 @@ func (m *model) Profile(id string) (user.User, error) {
 
 func (m *model) Update(data user.User) error {
 	var selectUpdate []string
-	if data.Name != "" {
-		selectUpdate = append(selectUpdate, "name")
+	if data.Fullname != "" {
+		selectUpdate = append(selectUpdate, "fullname")
+	}
+	if data.Username != "" {
+		selectUpdate = append(selectUpdate, "username")
 	}
 	if data.Email != "" {
 		selectUpdate = append(selectUpdate, "email")
 	}
-	if data.Hp != "" {
-		selectUpdate = append(selectUpdate, "hp")
+	if data.Handphone != "" {
+		selectUpdate = append(selectUpdate, "handphone")
+	}
+	if data.Biodata != "" {
+		selectUpdate = append(selectUpdate, "biodata")
 	}
 	if data.Password != "" {
-		selectUpdate = append(selectUpdate, "pasword")
+		selectUpdate = append(selectUpdate, "password")
 	}
 	if len(selectUpdate) == 0 {
 		return errors.New(helper.ErrorNoRowsAffected)
 	}
+
+	data.UpdatedAt = time.Now().UTC()
 
 	if query := m.connection.Model(&data).Select(selectUpdate).Updates(&data); query.Error != nil {
 		return errors.New(helper.ErrorGeneralDatabase)
