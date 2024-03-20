@@ -27,7 +27,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/imgkmb:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sosmedapp:latest
       -  
         name: connect ssh
         uses: appleboy/ssh-action@v0.1.9
@@ -39,5 +39,5 @@ jobs:
           script: |
             docker stop ${{ secrets.CNAME }}
             docker rm ${{ secrets.CNAME }}
-            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/imgkmb
-            docker run --name ${{ secrets.CNAME }} -p 8000:1323 -d -e DBHost=${{secrets.DBHOST}} -e DBPort=3306 -e DBUsername=${{secrets.DBUSERNAME}} -e DBName=${{secrets.DBNAME}} -e DBPassword=${{secrets.DBPASSWORD}} -e JWT_SECRET=${{secrets.JWT_SECRET}} ${{ secrets.DOCKERHUB_USERNAME }}/imgkmb
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/sosmedapp
+            docker run --name ${{ secrets.CNAME }} -p 8000:1323 -d -e DBHost=${{secrets.DBHOST}} -e DBPort=3306 -e DBUsername=${{secrets.DBUSERNAME}} -e DBName=${{secrets.DBNAME}} -e DBPassword=${{secrets.DBPASSWORD}} -e JWT_SECRET=${{secrets.JWT_SECRET}} ${{ secrets.DOCKERHUB_USERNAME }}/sosmedapp
