@@ -57,7 +57,7 @@ func (ct *controller) Create() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
 
-		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan kegiatan", nil))
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "success create post", nil))
 	}
 }
 
@@ -102,16 +102,16 @@ func (ct *controller) Edit() echo.HandlerFunc {
 				helper.ResponseFormat(code, err.Error(), nil))
 		}
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success update task", nil))
+			helper.ResponseFormat(http.StatusOK, "success edit post", nil))
 	}
 }
 
 func (ct *controller) Posts() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var inputUserId = c.QueryParam("username")
-		var inputLimit = c.QueryParam("limit")
+		var inputUsername = c.QueryParam("username")
+		var inputPage = c.QueryParam("page")
 
-		result, err := ct.s.Posts(inputUserId, inputLimit)
+		result, err := ct.s.Posts(inputUsername, inputPage)
 		if err != nil {
 			var code = http.StatusInternalServerError
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
@@ -151,7 +151,7 @@ func (ct *controller) Delete() echo.HandlerFunc {
 				helper.ResponseFormat(code, err.Error(), nil))
 		}
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success update task", nil))
+			helper.ResponseFormat(http.StatusOK, "success delete post", nil))
 	}
 }
 
@@ -178,6 +178,6 @@ func (ct *controller) PostById() echo.HandlerFunc {
 		withComment.Comments = result.Comments
 
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success update task", result))
+			helper.ResponseFormat(http.StatusOK, "success get post", result))
 	}
 }

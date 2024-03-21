@@ -1,6 +1,7 @@
 package data
 
 import (
+	"Social_Media_Project_BE/features/comment"
 	post "Social_Media_Project_BE/features/post"
 	"errors"
 	"strconv"
@@ -49,17 +50,22 @@ func (pm *model) Edit(username string, postID string, editPost post.Post) error 
 	return nil
 }
 
-func (pm *model) Posts(username string, limit string) ([]post.Post, error) {
+func (pm *model) Posts(username string, page string) ([]post.Post, error) {
 	var posts []post.Post
 
-	if username == "" || limit == "" {
-		err := pm.connection.Find(&posts).Error
+	reqPage, _ := strconv.Atoi(page)
+
+	if reqPage < 1 {
+		reqPage = 1
+	}
+
+	if username == "" {
+		err := pm.connection.Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		reqLimit, _ := strconv.Atoi(limit)
-		if err := pm.connection.Where("username = ?", username).Find(&posts).Limit(reqLimit).Error; err != nil {
+		if err := pm.connection.Where("username = ?", username).Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -77,7 +83,12 @@ func (pm *model) PostById(postID string) (post.Post, error) {
 }
 
 func (pm *model) Delete(username string, postID string) error {
-	if err := pm.connection.Where("id = ?", postID).Delete(&username).Error; err != nil {
+
+	if err := pm.connection.Where("post_id = ? AND username = ?", postID, username).Delete(&comment.Comment{}).Error; err != nil {
+		return err
+	}
+
+	if err := pm.connection.Where("id = ? AND username = ?", postID, username).Delete(&Post{}).Error; err != nil {
 		return err
 	}
 	return nil
