@@ -1,11 +1,11 @@
 package handler
 
 type CreatePostRequest struct {
-	Image   string
-	Caption string
+	Image   string `json:"image" form:"image"`
+	Caption string `json:"caption" form:"caption"`
 }
 
 type EditPostRequest struct {
-	Image   string
-	Caption string
+	Image   string `json:"image" form:"image"`
+	Caption string `json:"caption" form:"caption"`
 }

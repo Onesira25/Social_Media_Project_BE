@@ -19,11 +19,11 @@ func New(db *gorm.DB) post.PostModel {
 	}
 }
 
-func (pm *model) Create(username string, post post.Post) error {
+func (pm *model) Create(username string, image string, caption string) error {
 	var inputProcess = Post{
 		Username: username,
-		Image:    post.Image,
-		Caption:  post.Caption,
+		Image:    image,
+		Caption:  caption,
 	}
 
 	qry := pm.connection.Create(&inputProcess)
@@ -37,8 +37,8 @@ func (pm *model) Create(username string, post post.Post) error {
 	return nil
 }
 
-func (pm *model) Edit(username string, postID string, editPost post.Post) error {
-	qry := pm.connection.Where("username = ? AND id = ?", username, postID).Updates(&editPost)
+func (pm *model) Edit(username string, postID string, image string, caption string) error {
+	qry := pm.connection.Model(&Post{}).Where("username = ? AND id = ?", username, postID).Update("image", image).Update("caption", caption)
 	if err := qry.Error; err != nil {
 		return err
 	}
