@@ -1,0 +1,562 @@
+openapi: 3.0.0
+info:
+  description: |
+    Open API - Social Media Project
+  version: "1.0.0"
+  title: Social Media Project
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: server ubuntu
+    url: http://54.169.185.156:8000
+  - description: Local Development
+    url: 'localhost:8000/'
+    variables:
+      versi:
+        default: v1
+        enum:
+          - v1
+          - v2
+tags:
+  - name: user
+    description: Organize Data User
+  - name: post
+    description: Organize Data post
+  - name: comment
+    description: Organize Data comment
+paths:
+  /users:
+    post:
+      tags:
+        - user
+      summary: Add a New User
+      description: Registering New User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullname
+                - username
+                - handphone
+                - email
+                - password
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                handphone:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              fullname: "Muhamad Khomsin Ariseno"
+              username: "khomsin.ariseno"
+              handphone: "089512345678"
+              email: "khomsin.ariseno@gmail.com"
+              password: "pass123"
+      responses:
+        '201':
+          description: New User Added Successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                code: 201
+                message: "selamat data anda sudah terdaftar"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: See Your Profile
+      description: See Your Profile Using Token
+      responses:
+        '200':
+          description: "Successfully Get MyProfile"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDataResponse'
+              example: 
+                code: 200
+                data:
+                  fullname: "Muhamad Khomsin Ariseno"
+                  username: "khomsin.ariseno"
+                  handphone: "089512345678"
+                  email: "khomsin.ariseno@gmail.com"
+                  biodata: "aku seorang petualang"
+                message: "Successfully Get MyProfile"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Update Data User
+      description: Update Data User Using Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullname
+                - username
+                - handphone
+                - email
+                - password
+              properties:
+                fullname:
+                  type: string
+                username:
+                  type: string
+                handphone:
+                  type: string
+                email:
+                  type: string
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                biodata:
+                  type: string
+            example:
+              fullname: "Muhamad Khomsin Ariseno"
+              username: "khomsin.ariseno"
+              handphone: "089512345678"
+              email: "khomsin.ariseno@gmail.com"
+              password: "password123"
+              biodata: "aku seorang petualang"
+      responses:
+        '200':
+          description: "Update Data Successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example: 
+                code : 200
+                message: "success update user"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - user
+      security:
+        - bearerAuth: []
+      summary: Delete User
+      responses:
+        '200':
+          description: "Successfully Delete User"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                code: 200
+                message: "Successfully Delete User"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /login:
+    post:
+      tags:
+        - user
+      summary: Login Using HP or email or username and Password
+      description: Input Your HP, email, or username and Password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              email: "khomsin.ariseno@gmail.com"
+              password: "pass123"
+      responses:
+        '200':
+          description: "Login Successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDataResponse'
+              example: 
+                code: 200
+                data:
+                  name: "Muhamad Khomsin Ariseno"
+                  token: "abogoboga_12sfqQSF008@yuhuu"
+                message: "Login Successfully"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'    
+  /posts:
+    post:
+      tags:
+        - post
+      security:
+        - bearerAuth: []
+      summary: Add New Post
+      description: Add New Post Using Token
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                caption:
+                  type: string
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+            example:
+              caption: "jalan-jalan dulu gaes"
+      responses:
+        '201':
+          description: "New Post Added Successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                code: 201
+                message: "New Post Added Successfully"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    get:
+      tags:
+        - post
+      parameters:
+        - in: query
+          name: userid
+          schema:
+            type: integer
+          description: id user yang ingin ditampilkan postnya
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: berapa data post yang ingin ditampilkan dalam satu page
+      summary: See Posts
+      description: See Posts
+      responses:
+        '200':
+          description: "Successfully See Posts"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDataArrayResponse'
+              example:
+                code: 200
+                data:
+                  - id: 1
+                    username: "onesira" 
+                    created_at: "2024-03-17T08:19:25.479Z"
+                    image: "urlfoto/1"
+                    caption: "kita lagi di pantai nih gaes"
+                  - id: 2
+                    username: "gerytrap" 
+                    created_at: "2024-03-17T08:19:25.479Z"
+                    image: ""
+                    caption: "kita mabar dulu ga si"
+                  - id: 3
+                    username: "sin"
+                    created_at: "2024-03-17T08:19:25.479Z"
+                    image: "urlfoto/3"
+                    caption: ""
+                message: "Successfully See Posts"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /posts/{postID}:
+    get:
+      tags:
+        - post
+      parameters:
+        - name: postID
+          in: path
+          description: ID post yang ingin di hapus
+          required: true
+          schema:
+            type: string
+          example: 1
+      summary: See Post With Comments
+      responses:
+        '200':
+          description: "Successfully See Post With Comments"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDataResponse'
+              example: 
+                code : 200
+                data:
+                  id: 1
+                  username: onesira
+                  created_at: "2024-03-17T08:19:25.479Z"
+                  image: "urlfoto/1"
+                  caption: "kita lagi di pantai nih gaes"
+                  comments:
+                  - username: "user1"
+                    comment: "isi komennya"
+                    created_at: "2024-10-10"
+                  - username: "user2"
+                    comment: "komentar"
+                    created_at: "2024-10-10"
+                message: "Successfully Get Post With Comment"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    delete:
+      tags:
+        - post
+      security:
+        - bearerAuth: []
+      parameters: 
+        - name: postID
+          in: path
+          description: ID post yang ingin di hapus
+          required: true
+          schema:
+            type: string
+          example: 1
+      summary: Delete Post
+      description: Delete Post Using Token
+      responses:
+        '200':
+          description: "Successfully Delete Post"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example: 
+                code : 200
+                message: "Successfully Delete Post"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+    put:
+      tags:
+        - post
+      security:
+        - bearerAuth: []
+      parameters: 
+        - name: postID
+          in: path
+          description: ID post yang ingin di edit
+          required: true
+          schema:
+            type: string
+          example: 1
+      summary: Edit Post
+      description: Edit Post Using Token
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                caption:
+                  type: string
+          application/json:
+            schema:
+              type: object
+              properties:
+                caption:
+                  type: string
+            example:
+              caption: "jalan-jalan dulu gaes"
+      responses:
+        '200':
+          description: "Successfully Edit Post"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                code: 200
+                message: "Successfully Edit Post"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /comments:
+    post:
+      tags:
+        - comment
+      security:
+        - bearerAuth: []
+      summary: Create a comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - post_id
+                - comment
+              properties:
+                post_id:
+                  type: integer
+                comment:
+                  type: string
+            example:
+              post_id: 1
+              comment: "wkwkkw lucu banget guss"
+      responses:
+        '201':
+          description: "Successfully Add Comment"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example: 
+                code : 201
+                message: "Successfully Add Comment"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+  /comments/{commentID}:
+    delete:
+      tags:
+        - comment
+      security:
+        - bearerAuth: []
+      parameters: 
+        - name: commentID
+          in: path
+          description: ID comment yang ingin di hapus
+          required: true
+          schema:
+            type: string
+          example: 1
+      summary: Delete Comment
+      responses:
+        '200':
+          description: "Successfully Delete Comment"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                code: 200
+                message: "Successfully Delete Comment"
+        '400':
+          $ref: '#/components/responses/400'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    ApiDataResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        data:
+          type: object
+        message:
+          type: string
+    ApiDataArrayResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int8
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+  responses:
+    '201':
+      description: "success registered"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example: 
+            code: 201
+            message: "Congratulations, the data has been registered"
+    '400':
+      description: "Bad Required"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example: 
+            code: 400
+            message: "the data sent is incorrect"
+    '401':
+          description: "Unauthorized"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "invalid or expired jwt"
+    '500':
+      description: "server error"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponse'
+          example:
+            code: 500
+            message: "an error occurred in the server process"
+  securitySchemes:
+    bearerAuth:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
