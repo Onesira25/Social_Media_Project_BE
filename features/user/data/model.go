@@ -1,14 +1,20 @@
 package data
 
-import "time"
+import (
+	comment "Social_Media_Project_BE/features/comment/data"
+	post "Social_Media_Project_BE/features/post/data"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
-	ID        uint      `json:"-" form:"-" gorm:"primarykey"`
-	CreatedAt time.Time `json:"created_at" form:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" form:"updated_at"`
-	Fullname  string    `json:"fullname" form:"fullname"`
-	Username  string    `json:"usename" form:"usename"`
-	Handphone string    `json:"handphone" form:"handphone" gorm:"unique"`
-	Email     string    `json:"email" form:"email" gorm:"unique"`
-	Password  string    `json:"-" form:"-"`
+	gorm.Model
+	Fullname  string
+	Username  string `gorm:"unique"`
+	Email     string `gorm:"unique"`
+	Handphone string `gorm:"unique"`
+	Password  string
+	Biodata   string
+	Posts     []post.Post       `gorm:"foreignKey:Username;references:Username"`
+	Comments  []comment.Comment `gorm:"foreignKey:Username;references:Username"`
 }

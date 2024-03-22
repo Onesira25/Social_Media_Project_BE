@@ -10,7 +10,8 @@ import (
 func GenerateJWT(id string) (string, error) {
 	var data = jwt.MapClaims{}
 	data["id"] = id
-	data["iat"] = time.Now()
+	// data["username"] = username
+	data["iat"] = time.Now().Unix()
 	data["exp"] = time.Now().Add(time.Hour * 3).Unix()
 
 	var proccessToken = jwt.NewWithClaims(jwt.SigningMethodHS256, data)
@@ -28,6 +29,17 @@ func DecodeToken(i interface{}) string {
 	var result string
 
 	if val, found := claim["id"]; found {
+		result = val.(string)
+	}
+
+	return result
+}
+
+func DecodeTokenUsername(i interface{}) string {
+	var claim = i.(*jwt.Token).Claims.(jwt.MapClaims)
+	var result string
+
+	if val, found := claim["username"]; found {
 		result = val.(string)
 	}
 
