@@ -23,8 +23,8 @@ func NewHandler(service post.PostServices) post.PostController {
 
 func (ct *controller) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var input CreatePostRequest
-		err := c.Bind(&input)
+		caption := c.FormValue("caption")
+		file, err := c.FormFile("image")
 		if err != nil {
 			log.Println("error bind data:", err.Error())
 			if strings.Contains(err.Error(), "unsupport") {
@@ -44,13 +44,9 @@ func (ct *controller) Create() echo.HandlerFunc {
 			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-		var inputProcess post.Post
-		inputProcess.Image = input.Image
-		inputProcess.Caption = input.Caption
-
-		err = ct.s.Create(token, inputProcess)
+		err = ct.s.Create(token, file, caption)
 		if err != nil {
-			log.Println("error insert db:", err.Error())
+			log.Println("error upload image:", err.Error())
 			return c.JSON(helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
 
@@ -60,6 +56,13 @@ func (ct *controller) Create() echo.HandlerFunc {
 
 func (ct *controller) Edit() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		caption := c.FormValue("caption")
+		file, err := c.FormFile("image")
+		if err != nil {
+			log.Print("error:", err.Error())
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, "image not found", nil))
+		}
+
 		token, ok := c.Get("user").(*jwt.Token)
 		defer func() {
 			if err := recover(); err != nil {
@@ -71,22 +74,9 @@ func (ct *controller) Edit() echo.HandlerFunc {
 			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-		var input EditPostRequest
-		err := c.Bind(&input)
-		if err != nil {
-			if strings.Contains(err.Error(), "unsupport") {
-				return c.JSON(helper.ResponseFormat(http.StatusUnsupportedMediaType, helper.UserInputFormatError, nil))
-			}
-			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
-
-		var processInput post.Post
-		processInput.Image = input.Image
-		processInput.Caption = input.Caption
-
 		postID := c.Param("postID")
 
-		err = ct.s.Edit(token, postID, processInput)
+		err = ct.s.Edit(token, postID, file, caption)
 		if err != nil {
 			var code = http.StatusInternalServerError
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
