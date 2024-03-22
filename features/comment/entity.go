@@ -13,7 +13,7 @@ type CommentController interface {
 }
 
 type CommentModel interface {
-	Create(username string, postID uint, newComment string) error
+	Create(userID uint, username string, postID uint, newComment string) error
 	Delete(username string, postID string) error
 }
 
@@ -23,10 +23,8 @@ type CommentServices interface {
 }
 
 type Comment struct {
-	Id        uint
-	Username  string
-	PostId    uint
 	CreatedAt time.Time
+	Username  string
 	Comment   string
 }
 

@@ -3,7 +3,6 @@ package data
 import (
 	"Social_Media_Project_BE/features/comment"
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -18,12 +17,12 @@ func New(db *gorm.DB) comment.CommentModel {
 	}
 }
 
-func (cm *model) Create(username string, postID uint, comment string) error {
+func (cm *model) Create(userID uint, username string, postID uint, comment string) error {
 	var inputProcess = Comment{
-		Username:  username,
-		PostId:    postID,
-		Comment:   comment,
-		CreatedAt: time.Now().UTC(),
+		Username: username,
+		UserID:   userID,
+		PostID:   postID,
+		Comment:  comment,
 	}
 
 	qry := cm.connection.Create(&inputProcess)

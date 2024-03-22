@@ -109,7 +109,7 @@ func (ct *controller) Posts() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
 				code = http.StatusBadRequest
 			}
-			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
+			return c.JSON(helper.ResponseFormat(code, err.Error()))
 		}
 		return c.JSON(helper.ResponseFormat(http.StatusOK, "successfully get posts", result))
 	}
@@ -155,13 +155,12 @@ func (ct *controller) PostById() echo.HandlerFunc {
 			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
 		}
 
-		var withComment GetPostWithCommentsResponse
-		withComment.Id = result.Id
-		withComment.CreatedAt = result.CreatedAt
-		withComment.Username = result.Username
-		withComment.Image = result.Image
-		withComment.Caption = result.Caption
-		withComment.Comments = result.Comments
+		// var withComment GetPostWithCommentsResponse
+		// withComment.CreatedAt = result.CreatedAt.UTC()
+		// withComment.Username = result.Username
+		// withComment.Image = result.Image
+		// withComment.Caption = result.Caption
+		// withComment.Comments = result.Comments
 
 		return c.JSON(helper.ResponseFormat(http.StatusOK, "success get post", result))
 	}

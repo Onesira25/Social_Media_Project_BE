@@ -24,13 +24,15 @@ func NewTodoService(model post.PostModel) post.PostServices {
 }
 
 func (s *services) Create(token *jwt.Token, newPost post.Post) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
 	}
 
-	err := s.m.Create(decodeUsername, newPost)
+	newPost.Username = decodeUsername
+
+	err := s.m.Create(newPost)
 	if err != nil {
 		return errors.New(helper.ServerGeneralError)
 	}
@@ -39,7 +41,7 @@ func (s *services) Create(token *jwt.Token, newPost post.Post) error {
 }
 
 func (s *services) Edit(token *jwt.Token, postID string, editPost post.Post) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
@@ -53,8 +55,8 @@ func (s *services) Edit(token *jwt.Token, postID string, editPost post.Post) err
 	return nil
 }
 
-func (s *services) Posts(username string, limit string) ([]post.Post, error) {
-	result, err := s.m.Posts(username, limit)
+func (s *services) Posts(username string, page string) ([]post.Post, error) {
+	result, err := s.m.Posts(username, page)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,7 @@ func (s *services) PostById(postID string) (post.Post, error) {
 }
 
 func (s *services) Delete(token *jwt.Token, postID string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")

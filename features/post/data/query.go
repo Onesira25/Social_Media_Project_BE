@@ -19,14 +19,8 @@ func New(db *gorm.DB) post.PostModel {
 	}
 }
 
-func (pm *model) Create(username string, post post.Post) error {
-	var inputProcess = Post{
-		Username: username,
-		Image:    post.Image,
-		Caption:  post.Caption,
-	}
-
-	qry := pm.connection.Create(&inputProcess)
+func (pm *model) Create(post post.Post) error {
+	qry := pm.connection.Create(&post)
 	if err := qry.Error; err != nil {
 		return err
 	}
@@ -37,8 +31,8 @@ func (pm *model) Create(username string, post post.Post) error {
 	return nil
 }
 
-func (pm *model) Edit(username string, postID string, editPost post.Post) error {
-	qry := pm.connection.Where("username = ? AND id = ?", username, postID).Updates(&editPost)
+func (pm *model) Edit(userID string, postID string, editPost post.Post) error {
+	qry := pm.connection.Where("user_id = ? AND id = ?", userID, postID).Updates(&editPost)
 	if err := qry.Error; err != nil {
 		return err
 	}
@@ -60,11 +54,13 @@ func (pm *model) Posts(username string, page string) ([]post.Post, error) {
 	}
 
 	if username == "" {
+		// err := pm.connection.Select("posts., users.username").Joins("INNER JOIN posts ON posts.user_id = users.id").Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error
 		err := pm.connection.Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error
 		if err != nil {
 			return nil, err
 		}
 	} else {
+		// if err := pm.connection.Preload("Comments").Select("posts, comments, users.username").Joins("INNER JOIN posts ON posts.user_id = users.id").Joins("INNER JOIN comments ON posts.user_id = users.id").Where("username = ?", username).Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error; err != nil {
 		if err := pm.connection.Where("username = ?", username).Limit(10).Offset(reqPage*10 - 10).Find(&posts).Error; err != nil {
 			return nil, err
 		}

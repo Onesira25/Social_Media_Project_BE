@@ -1,11 +1,11 @@
-package posting
+package post
 
 import (
 	"Social_Media_Project_BE/features/comment"
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type PostController interface {
@@ -17,8 +17,8 @@ type PostController interface {
 }
 
 type PostModel interface {
-	Create(username string, newPost Post) error
-	Edit(username string, postID string, editPost Post) error
+	Create(newPost Post) error
+	Edit(userID string, postID string, editPost Post) error
 	Posts(username string, limit string) ([]Post, error)
 	PostById(postID string) (Post, error)
 	Delete(username string, postID string) error
@@ -27,18 +27,17 @@ type PostModel interface {
 type PostServices interface {
 	Create(token *jwt.Token, newPost Post) error
 	Edit(token *jwt.Token, postID string, EditPost Post) error
-	Posts(username string, limit string) ([]Post, error)
+	Posts(username string, page string) ([]Post, error)
 	PostById(postID string) (Post, error)
 	Delete(token *jwt.Token, postID string) error
 }
 
 type Post struct {
-	Id        uint              `json:"id"`
-	CreatedAt time.Time         `json:"created_at"`
-	Username  string            `json:"username"`
-	Image     string            `json:"image"`
-	Caption   string            `json:"caption"`
-	Comments  []comment.Comment `json:"comments"`
+	gorm.Model
+	Username string
+	Image    string
+	Caption  string
+	Comments []comment.Comment
 }
 
 type CreatePost struct {

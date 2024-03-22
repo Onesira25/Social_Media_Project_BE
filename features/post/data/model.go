@@ -8,8 +8,9 @@ import (
 
 type Post struct {
 	gorm.Model
+	UserID   uint
 	Username string
 	Image    string
 	Caption  string
-	Comments []data.Comment `gorm:"foreignKey:PostId;references:Id"`
+	Comments []data.Comment
 }

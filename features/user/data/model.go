@@ -15,6 +15,6 @@ type User struct {
 	Handphone string `gorm:"unique"`
 	Password  string
 	Biodata   string
-	Posts     []post.Post       `gorm:"foreignKey:Username;references:Username"`
-	Comments  []comment.Comment `gorm:"foreignKey:Username;references:Username"`
+	Posts     []post.Post
+	Comments  []comment.Comment
 }

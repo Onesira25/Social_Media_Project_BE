@@ -1,10 +1,13 @@
 package user
 
 import (
+	comment "Social_Media_Project_BE/features/comment/data"
+	post "Social_Media_Project_BE/features/post/data"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type Controller interface {
@@ -32,15 +35,15 @@ type Model interface {
 }
 
 type User struct {
-	ID        uint `gorm:"primarykey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	gorm.Model
 	Fullname  string
 	Username  string
-	Handphone string `gorm:"unique"`
-	Email     string `gorm:"unique"`
-	Biodata   string
+	Email     string
+	Handphone string
 	Password  string
+	Biodata   string
+	Posts     []post.Post
+	Comments  []comment.Comment
 }
 
 type Login struct {
