@@ -6,6 +6,7 @@ import (
 	"Social_Media_Project_BE/middlewares"
 	"errors"
 	"log"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
@@ -25,12 +26,15 @@ func CommentService(model comment.CommentModel) comment.CommentServices {
 
 func (s *services) Create(token *jwt.Token, postID uint, comment string) error {
 	decodeUsername := middlewares.DecodeTokenUsername(token)
+	decodeUserID := middlewares.DecodeToken(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
 	}
 
-	err := s.m.Create(decodeUsername, postID, comment)
+	userID, _ := strconv.ParseUint(decodeUserID, 10, 32)
+
+	err := s.m.Create(uint(userID), decodeUsername, postID, comment)
 	if err != nil {
 		return errors.New(helper.ServerGeneralError)
 	}

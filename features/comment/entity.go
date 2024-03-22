@@ -13,7 +13,7 @@ type CommentController interface {
 }
 
 type CommentModel interface {
-	Create(username string, postID uint, newComment string) error
+	Create(userID uint, username string, postID uint, newComment string) error
 	Delete(username string, postID string) error
 }
 
