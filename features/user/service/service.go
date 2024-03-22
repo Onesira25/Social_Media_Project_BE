@@ -79,7 +79,7 @@ func (s *service) Login(login_data user.User) (user.LoginResponse, error) {
 	}
 
 	// Create Token
-	token, err := middlewares.GenerateJWT(strconv.Itoa(int(dbData.ID)))
+	token, err := middlewares.GenerateJWT(strconv.Itoa(int(dbData.ID)), dbData.Username)
 	if err != nil {
 		return user.LoginResponse{}, errors.New(helper.ErrorGeneralServer)
 	}
