@@ -8,9 +8,8 @@ import (
 
 type Post struct {
 	gorm.Model
-	UserID   uint
-	Username string
+	Username string `gorm:"type:varchar(15)"`
 	Image    string
 	Caption  string
-	Comments []data.Comment
+	Comments []data.Comment `gorm:"foreignKey:PostId;references:ID"`
 }

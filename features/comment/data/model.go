@@ -1,11 +1,15 @@
 package data
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Comment struct {
 	gorm.Model
-	UserID   uint
-	Username string
-	PostID   uint
-	Comment  string
+	Username  string `gorm:"type:varchar(15)"`
+	PostId    uint
+	CreatedAt time.Time
+	Comment   string
 }

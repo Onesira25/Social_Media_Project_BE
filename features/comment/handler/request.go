@@ -1,6 +1,6 @@
 package handler
 
 type CreateCommentRequest struct {
-	PostId  uint
-	Comment string
+	PostId  uint   `json:"post_id"`
+	Comment string `json:"comment"`
 }

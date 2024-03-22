@@ -28,11 +28,11 @@ func main() {
 	userHandler := user_handler.NewHandler(userService)
 
 	postData := post_data.New(db)
-	postService := post_services.NewTodoService(postData)
+	postService := post_services.PostService(postData)
 	postHandler := post_handler.NewHandler(postService)
 
 	commentData := comment_data.New(db)
-	commentService := comment_services.NewTodoService(commentData)
+	commentService := comment_services.CommentService(commentData)
 	commentHandler := comment_handler.NewHandler(commentService)
 
 	e.Pre(middleware.RemoveTrailingSlash())
