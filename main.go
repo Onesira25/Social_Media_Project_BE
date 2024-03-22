@@ -8,6 +8,9 @@ import (
 	post_data "Social_Media_Project_BE/features/post/data"
 	post_handler "Social_Media_Project_BE/features/post/handler"
 	post_services "Social_Media_Project_BE/features/post/services"
+	user_data "Social_Media_Project_BE/features/user/data"
+	user_handler "Social_Media_Project_BE/features/user/handler"
+	user_service "Social_Media_Project_BE/features/user/service"
 	"Social_Media_Project_BE/routes"
 
 	"github.com/labstack/echo/v4"
@@ -18,6 +21,11 @@ func main() {
 	e := echo.New()
 	cfg := config.InitConfig()
 	db := config.InitSQL(cfg)
+	config.Migrate(db, &user_data.User{}, &post_data.Post{}, &comment_data.Comment{})
+
+	userData := user_data.New(db)
+	userService := user_service.NewService(userData)
+	userHandler := user_handler.NewHandler(userService)
 
 	postData := post_data.New(db)
 	postService := post_services.NewTodoService(postData)
@@ -31,6 +39,6 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 
-	routes.InitRoute(e, postHandler, commentHandler)
+	routes.InitRoute(e, userHandler, postHandler, commentHandler)
 	e.Logger.Fatal(e.Start(":1323"))
 }

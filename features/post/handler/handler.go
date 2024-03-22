@@ -26,9 +26,11 @@ func (ct *controller) Create() echo.HandlerFunc {
 		caption := c.FormValue("caption")
 		file, err := c.FormFile("image")
 		if err != nil {
-			log.Print("error:", err.Error())
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, "image not found", nil))
+			log.Println("error bind data:", err.Error())
+			if strings.Contains(err.Error(), "unsupport") {
+				return c.JSON(helper.ResponseFormat(http.StatusUnsupportedMediaType, helper.UserInputFormatError, nil))
+			}
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
 		token, ok := c.Get("user").(*jwt.Token)
@@ -39,17 +41,16 @@ func (ct *controller) Create() echo.HandlerFunc {
 			}
 		}()
 		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
 		err = ct.s.Create(token, file, caption)
 		if err != nil {
 			log.Println("error upload image:", err.Error())
-			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+			return c.JSON(helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
 
-		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "success create post", nil))
+		return c.JSON(helper.ResponseFormat(http.StatusCreated, "success create post", nil))
 	}
 }
 
@@ -59,8 +60,7 @@ func (ct *controller) Edit() echo.HandlerFunc {
 		file, err := c.FormFile("image")
 		if err != nil {
 			log.Print("error:", err.Error())
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, "image not found", nil))
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, "image not found", nil))
 		}
 
 		token, ok := c.Get("user").(*jwt.Token)
@@ -71,8 +71,7 @@ func (ct *controller) Edit() echo.HandlerFunc {
 			}
 		}()
 		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
 		postID := c.Param("postID")
@@ -83,11 +82,9 @@ func (ct *controller) Edit() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
 				code = http.StatusBadRequest
 			}
-			return c.JSON(code,
-				helper.ResponseFormat(code, err.Error(), nil))
+			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
 		}
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success edit post", nil))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "success edit post", nil))
 	}
 }
 
@@ -102,11 +99,9 @@ func (ct *controller) Posts() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
 				code = http.StatusBadRequest
 			}
-			return c.JSON(code,
-				helper.ResponseFormat(code, err.Error(), nil))
+			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
 		}
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "successfully get posts", result))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "successfully get posts", result))
 	}
 }
 
@@ -120,8 +115,7 @@ func (ct *controller) Delete() echo.HandlerFunc {
 			}
 		}()
 		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+			return c.JSON(helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
 		postID := c.Param("postID")
@@ -132,11 +126,9 @@ func (ct *controller) Delete() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
 				code = http.StatusBadRequest
 			}
-			return c.JSON(code,
-				helper.ResponseFormat(code, err.Error(), nil))
+			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
 		}
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success delete post", nil))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "success delete post", nil))
 	}
 }
 
@@ -150,8 +142,7 @@ func (ct *controller) PostById() echo.HandlerFunc {
 			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
 				code = http.StatusBadRequest
 			}
-			return c.JSON(code,
-				helper.ResponseFormat(code, err.Error(), nil))
+			return c.JSON(helper.ResponseFormat(code, err.Error(), nil))
 		}
 
 		var withComment GetPostWithCommentsResponse
@@ -162,7 +153,6 @@ func (ct *controller) PostById() echo.HandlerFunc {
 		withComment.Caption = result.Caption
 		withComment.Comments = result.Comments
 
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "success get post", result))
+		return c.JSON(helper.ResponseFormat(http.StatusOK, "success get post", result))
 	}
 }

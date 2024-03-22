@@ -28,7 +28,7 @@ func NewTodoService(model post.PostModel) post.PostServices {
 }
 
 func (s *services) Create(token *jwt.Token, image *multipart.FileHeader, caption string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
@@ -63,7 +63,7 @@ func (s *services) Create(token *jwt.Token, image *multipart.FileHeader, caption
 }
 
 func (s *services) Edit(token *jwt.Token, postID string, image *multipart.FileHeader, caption string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
@@ -116,7 +116,7 @@ func (s *services) PostById(postID string) (post.Post, error) {
 }
 
 func (s *services) Delete(token *jwt.Token, postID string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
