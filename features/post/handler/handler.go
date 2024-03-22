@@ -146,7 +146,7 @@ func (ct *controller) PostById() echo.HandlerFunc {
 		}
 
 		var withComment GetPostWithCommentsResponse
-		withComment.Id = result.Id
+		withComment.Id = result.ID
 		withComment.CreatedAt = result.CreatedAt
 		withComment.Username = result.Username
 		withComment.Image = result.Image

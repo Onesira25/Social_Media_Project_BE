@@ -20,7 +20,7 @@ type services struct {
 	v *validator.Validate
 }
 
-func NewTodoService(model post.PostModel) post.PostServices {
+func PostService(model post.PostModel) post.PostServices {
 	return &services{
 		m: model,
 		v: validator.New(),

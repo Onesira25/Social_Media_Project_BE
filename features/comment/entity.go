@@ -23,10 +23,10 @@ type CommentServices interface {
 }
 
 type Comment struct {
-	Id        uint
+	ID        uint
+	CreatedAt time.Time
 	Username  string
 	PostId    uint
-	CreatedAt time.Time
 	Comment   string
 }
 

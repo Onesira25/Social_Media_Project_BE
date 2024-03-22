@@ -16,7 +16,7 @@ type services struct {
 	v *validator.Validate
 }
 
-func NewTodoService(model comment.CommentModel) comment.CommentServices {
+func CommentService(model comment.CommentModel) comment.CommentServices {
 	return &services{
 		m: model,
 		v: validator.New(),

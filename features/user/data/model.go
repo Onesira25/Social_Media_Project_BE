@@ -10,10 +10,10 @@ import (
 type User struct {
 	gorm.Model
 	Fullname  string
-	Username  string `gorm:"unique"`
-	Email     string `gorm:"unique"`
-	Handphone string `gorm:"unique"`
+	Username  string `gorm:"type:varchar(15);unique"`
+	Email     string
 	Password  string
+	Handphone string
 	Biodata   string
 	Posts     []post.Post       `gorm:"foreignKey:Username;references:Username"`
 	Comments  []comment.Comment `gorm:"foreignKey:Username;references:Username"`
