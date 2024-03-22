@@ -1,13 +1,11 @@
 package data
 
-import (
-	"time"
-)
+import "gorm.io/gorm"
 
 type Comment struct {
-	Id        uint `gorm:"primaryKey"`
-	Username  string
-	PostId    uint
-	CreatedAt time.Time
-	Comment   string
+	gorm.Model
+	UserID   uint
+	Username string
+	PostID   uint
+	Comment  string
 }
