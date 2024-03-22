@@ -24,7 +24,7 @@ func NewTodoService(model comment.CommentModel) comment.CommentServices {
 }
 
 func (s *services) Create(token *jwt.Token, postID uint, comment string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")
@@ -39,7 +39,7 @@ func (s *services) Create(token *jwt.Token, postID uint, comment string) error {
 }
 
 func (s *services) Delete(token *jwt.Token, commentID string) error {
-	decodeUsername := middlewares.DecodeToken(token)
+	decodeUsername := middlewares.DecodeTokenUsername(token)
 	if decodeUsername == "" {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")

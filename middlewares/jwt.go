@@ -28,9 +28,18 @@ func DecodeToken(i interface{}) string {
 	var claim = i.(*jwt.Token).Claims.(jwt.MapClaims)
 	var result string
 
-	// if val, found := claim["username"]; found {}
-
 	if val, found := claim["id"]; found {
+		result = val.(string)
+	}
+
+	return result
+}
+
+func DecodeTokenUsername(i interface{}) string {
+	var claim = i.(*jwt.Token).Claims.(jwt.MapClaims)
+	var result string
+
+	if val, found := claim["username"]; found {
 		result = val.(string)
 	}
 
